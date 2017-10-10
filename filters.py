@@ -4,7 +4,6 @@ from scipy.fftpack import fft
 import matplotlib.pyplot as plt
 from matplotlib import style
 from scipy.integrate import simps
-from numpy import trapz
 
 style.use('dark_background')
 
@@ -43,23 +42,22 @@ def filter(data , cutoff = None , cut_low = None):
 	return new_data
 
 def calculate_area(data , Simpsons = True): 
-	if Simpsons: 
-		try : 
-			simps(data['Amplitude'] , dx = (data['Frequency'][1] - data['Frequency'][0]))
-		except :  
-			print('Error : Cannot apply Simpsons Rule')
+	if Simpsons:
 		return simps(data['Amplitude'] , dx = (data['Frequency'][1] - data['Frequency'][0]))
-	return trapz(data['Amplitude'] , dx = (data['Frequency'][1] - data['Frequency'][0]))
+	return np.trapz(data['Amplitude'] , dx = (data['Frequency'][1] - data['Frequency'][0]))
 
 def discrete_spectral_density(data , spacing = 50):
 	areas = []
 	for i in range(0 , int(np.max(data['Frequency'])) , spacing):
-		areas.append(calculate_area(filter(data , i + spacing , i) , Simpsons = True))
+		areas.append(calculate_area(filter(data , i + spacing , i) , Simpsons = False))
 	return areas
 
-def plot(y , data):
-	x = list(range(0 , int(np.max(data['Frequency'])) , 10))
+def plot(y , data , spacing = 50):
+	x = list(range(0 , int(np.max(data['Frequency'])) , spacing))
 	plt.plot(x , y)
+	plt.xlabel('Frequency(Hz)')
+	plt.ylabel('Spectral Density')
+	plt.grid(color = 'r')
 	plt.show()
 
 
@@ -69,8 +67,8 @@ def main():
 	filename = 'C:\\Users\\nick\\Desktop\\Dissertation\\Genres\\jazz\\jazz.00024.au'
 	data , fs = audioread(filename)
 	data = furrier_transform(data , fs)
-	spectral_info = discrete_spectral_density(data , spacing = 10)
-	plot(spectral_info , data)
+	spectral_info = discrete_spectral_density(data , spacing = 1)
+	plot(spectral_info , data , spacing = 1)
 	
 
 
