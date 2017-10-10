@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import style
 
+''' ---------------------------------- Version 0.1 --------------------------'''
+
 style.use('dark_background')
 
 def read_file(path):
