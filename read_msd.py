@@ -30,7 +30,7 @@ def keep_data(data , features_keep):
 	return data
 
 
-def create_labels(data , one_hot = True):
+def create_labels(data , one_hot_string = True):
 	genres = ['jazz and blues' , 'metal' , 'folk']
 	labels = []
 	new_data = []
@@ -40,6 +40,9 @@ def create_labels(data , one_hot = True):
 			new_data.append([data[i][x] for x in [1,2]])
 	labels = np.array(labels)
 	labels_onehot = (np.arange(len(genres)) == labels[: , None]).astype(int)
+	#new_labels = []
+	#for i in range(0 , len(labels_onehot)):
+		#new_labels.append(''.join(str(x) for x in labels_onehot[i]))
 	return new_data , labels , labels_onehot
 
 def plot_data(data , labels):
@@ -55,6 +58,12 @@ def plot_data(data , labels):
 	plt.scatter(x , y , c = new_labels)
 	plt.show()
 
+def preprocessing(data , labels_onehot , test_percentage = 0.2): 
+	all_data = list(zip(data , labels_onehot))
+	random.shuffle(all_data)
+	data , labels_onehot = zip(*all_data)
+	return data[:int(0.2*len(data))] , labels_onehot[:int(0.2*len(labels_onehot))] , data[-int(0.2*len(data)):] , labels_onehot[-int(0.2*len(labels_onehot)):]
+
 
 
 def main(): 
@@ -62,7 +71,9 @@ def main():
 	data = read_file(filename)
 	data = keep_data(data , ['genre' , 'tempo' , 'loudness'])
 	data , labels , labels_onehot = create_labels(data)
-	plot_data(data , labels)
+	return preprocessing(data , labels_onehot)
+
+	
 
 
 
