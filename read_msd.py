@@ -31,18 +31,15 @@ def keep_data(data , features_keep):
 
 
 def create_labels(data , one_hot_string = True):
-	genres = ['jazz and blues' , 'metal' , 'folk']
+	genres = ['metal' , 'folk' , 'electronica' , 'jazz and blues']
 	labels = []
 	new_data = []
 	for i in range(0 , len(data)):
 		if (data[i][0] in genres):
 			labels.append(genres.index(data[i][0]))
-			new_data.append([data[i][x] for x in [1,2]])
+			new_data.append([data[i][x] for x in range(1,len(data[0]))])
 	labels = np.array(labels)
 	labels_onehot = (np.arange(len(genres)) == labels[: , None]).astype(int)
-	#new_labels = []
-	#for i in range(0 , len(labels_onehot)):
-		#new_labels.append(''.join(str(x) for x in labels_onehot[i]))
 	return new_data , labels , labels_onehot
 
 def plot_data(data , labels):
@@ -62,14 +59,14 @@ def preprocessing(data , labels_onehot , test_percentage = 0.2):
 	all_data = list(zip(data , labels_onehot))
 	random.shuffle(all_data)
 	data , labels_onehot = zip(*all_data)
-	return data[:int(0.2*len(data))] , labels_onehot[:int(0.2*len(labels_onehot))] , data[-int(0.2*len(data)):] , labels_onehot[-int(0.2*len(labels_onehot)):]
+	return data[:int(0.2*len(data))] , labels_onehot[:int(0.2*len(labels_onehot))] , data[-int(0.2*len(data)):] , labels_onehot[-int(0.2*len(labels_onehot)):] , len(data[:int(0.2*len(data))])
 
 
 
 def main(): 
 	filename = 'C:/Users/nick/Desktop/Dissertation/msd_genre_dataset.txt'
 	data = read_file(filename)
-	data = keep_data(data , ['genre' , 'tempo' , 'loudness'])
+	data = keep_data(data , ['genre','loudness','tempo','time_signature','key','mode','duration','avg_timbre1','avg_timbre2','avg_timbre3','avg_timbre4','avg_timbre5','avg_timbre6','avg_timbre7','avg_timbre8','avg_timbre9','avg_timbre10','avg_timbre11','avg_timbre12','var_timbre1','var_timbre2','var_timbre3','var_timbre4','var_timbre5','var_timbre6','var_timbre7','var_timbre8','var_timbre9','var_timbre10','var_timbre11','var_timbre12'])
 	data , labels , labels_onehot = create_labels(data)
 	return preprocessing(data , labels_onehot)
 
