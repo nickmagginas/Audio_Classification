@@ -4,12 +4,14 @@ from scipy.fftpack import fft
 import matplotlib.pyplot as plt
 from matplotlib import style
 from scipy.integrate import simps
+import random
+import json
 
 style.use('dark_background')
 
 def audioread(filename):
 	data , fs = sf.read(filename)
-	data = data[:66000]
+	data = data[:660000]
 	return data , fs
 
 def find_nearest(x , value): 
@@ -46,36 +48,66 @@ def calculate_area(data , Simpsons = True):
 		return simps(data['Amplitude'] , dx = (data['Frequency'][1] - data['Frequency'][0]))
 	return np.trapz(data['Amplitude'] , dx = (data['Frequency'][1] - data['Frequency'][0]))
 
-def discrete_spectral_density(data , spacing = 50):
+def discrete_spectral_density(data , spacing = 50 , cutoff = 3920):
 	areas = []
-	for i in range(0 , int(np.max(data['Frequency'])) , spacing):
+	for i in range(0 , cutoff , spacing):
 		areas.append(calculate_area(filter(data , i + spacing , i) , Simpsons = False))
 	return areas
 
-def plot(y , data , spacing = 50):
-	x = list(range(0 , int(np.max(data['Frequency'])) , spacing))
+def plot(y , data , spacing = 50 , cutoff = 3920):
+	x = list(range(0 , cutoff , spacing))
 	plt.plot(x , y)
 	plt.xlabel('Frequency(Hz)')
 	plt.ylabel('Spectral Density')
 	plt.grid(color = 'r')
 	plt.show()
 
+def analyze_sample(filename):
+	data , fs = audioread(filename)
+	data = furrier_transform(data , fs)
+	spectral_info = discrete_spectral_density(data , spacing = 5)
+	return spectral_info
 
+
+def get_data(one_hot = False):
+	print('Beggining audio file reading')
+	audio_data = []
+	labels = []
+	genres = ['blues' , 'classical' , 'country' , 'disco' , 'hiphop' , 'jazz' , 'metal' , 'pop' , 'reggae' , 'rock']
+	main_path = 'C:\\Users\\nick\\Desktop\\Dissertation\\Genres'
+	n_samples = 100
+
+	for x in range(0 , len(genres)): 
+		genre_path = main_path + '\\' + genres[x]
+		for i in range(0 , n_samples):
+			current_count = '.' + '%05d' % i
+			song_path = genre_path + '\\' + genres[x] + current_count + '.au'
+			audio_data.append(analyze_sample(song_path))
+			labels.append(x)
+			if i%10 == 0:
+				print('Percentage Complete :' , int(((x*100)+i)/(len(genres)*100)*100) , '%')
+	print('Audio read succesfully')
+	with open('outX.txt' , 'w') as f:
+		json.dump(audio_data,f)
+	with open('outY.txt' , 'w') as f:
+		json.dump(labels,f)
+
+	labels = np.array(labels)
+	labels_onehot = (np.arange(len(genres)) == labels[: , None]).astype(int)
+
+	return audio_data , labels_onehot
+
+def create_dataset(x , y , test_percentage = 0.2): 
+	all_data = list(zip(x , y))
+	random.shuffle(all_data)
+	x , y = zip(*all_data)
+	return x[:int(test_percentage*len(x))] , y[:int(test_percentage*len(y))] , x[-int(test_percentage*len(x)):] , y[-int(test_percentage*len(y)):] , len(x)
 
 
 def main(): 
-	filename = 'C:\\Users\\nick\\Desktop\\Dissertation\\Genres\\jazz\\jazz.00024.au'
-	data , fs = audioread(filename)
-	data = furrier_transform(data , fs)
-	spectral_info = discrete_spectral_density(data , spacing = 1)
-	plot(spectral_info , data , spacing = 1)
+	x , y = get_data(one_hot = True)
+	return create_dataset(x , y)
 	
-
-
-
-
-
-
 
 if __name__ == '__main__':
 	main()
