@@ -3,10 +3,10 @@ import read_msd
 import numpy as np
 
 x = tf.placeholder(dtype = 'float32' , shape = [None , 30])
-y = tf.placeholder(dtype = 'float32' , shape = [None , 4])
-n_nodes_hl1 = 200
-n_nodes_hl2 = 200
-n_classes = 4
+y = tf.placeholder(dtype = 'float32' , shape = [None , 7])
+n_nodes_hl1 = 500
+n_nodes_hl2 = 500
+n_classes = 7
 batch_size = 50
 
 
@@ -26,7 +26,7 @@ def train_network(train_x , train_y , test_x , test_y , lenght):
 	prediction = neural_network(x)
 	cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = prediction , labels = y))
 	optimizer = tf.train.AdamOptimizer().minimize(cost)
-	epoch_number = 20
+	epoch_number = 10
 	with tf.Session() as sess: 
 		sess.run(tf.global_variables_initializer())
 

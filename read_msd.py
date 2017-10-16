@@ -31,7 +31,7 @@ def keep_data(data , features_keep):
 
 
 def create_labels(data , one_hot_string = True):
-	genres = ['metal' , 'folk' , 'electronica' , 'jazz and blues']
+	genres = ['metal' , 'folk' , 'electronica' , 'jazz and blues' , 'reaggae' , 'classical' , 'pop']
 	labels = []
 	new_data = []
 	for i in range(0 , len(data)):
