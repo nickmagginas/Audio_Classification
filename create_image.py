@@ -51,8 +51,13 @@ def create_image(data):
 	for i in range(1 , len(data)):
 		test_data.extend(data[i])
 	maximum = np.max(test_data)
-	for i in range(0 , len(data)):
-		test_data.extend(data[i])
+	mult = lambda x : (int(x * 255/maximum) , int(x * 255/maximum) , int(x * 255/maximum))
+	pixel_data = list(map(mult , test_data))
+	img = Image.new('RGB' , (2499 , 28))
+	img.putdata(pixel_data)
+	img.save('image.png')
+
+
 
 
 
@@ -63,8 +68,9 @@ def main():
 
 	segments_transformed = [filter(furrier_transform(segments[i],fs) , 2500 , 0) for i in range(0 , 28)]
 	frequency_concistency_test(segments_transformed)
-	#create_image(segments_transformed)
-	plot_data(segments_transformed)
+	#plot_data(segments_transformed)
+	create_image(segments_transformed)
+	
 
 
 
