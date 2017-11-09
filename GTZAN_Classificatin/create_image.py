@@ -22,7 +22,7 @@ def frequency_concistency_test(segments_transformed):
 		if segments_transformed[i]['Frequency'] != segments_transformed[i+1]['Frequency']: 
 			print('Dimension test failed')
 			return
-	print('Dimension test passsed')
+	#print('Dimension test passsed')
 
 def plot_data(segments_transformed , stacked = True): 
 
@@ -49,11 +49,13 @@ def create_image(data , filename):
 	for i in range(1 , len(data)):
 		test_data.extend(data[i])
 	maximum = np.max(test_data)
-	mult = lambda x : (int(x * 255/maximum) , int(x * 255/maximum) , int(x * 255/maximum))
+	mult = lambda x : (int(x * 255/maximum)) #, int(x * 255/maximum) , int(x * 255/maximum))
 	pixel_data = list(map(mult , test_data))
+	'''
 	img = Image.new('RGB' , (480 , 28))
 	img.putdata(pixel_data)
 	img.save(filename + '.png')
+	'''
 	return pixel_data
 
 
