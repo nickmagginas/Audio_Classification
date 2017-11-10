@@ -74,8 +74,9 @@ def get_data(one_hot = False):
 	print('Beggining audio file reading')
 	audio_data = []
 	labels = []
-	genres = ['blues' , 'classical'] #, 'country' , 'disco' , 'hiphop' , 'jazz' , 'metal' , 'pop' , 'reggae' , 'rock']
-	main_path = '/home/nick/Desktop/Dissertation/Audio_Classification/GTZAN_Classificatin/Genres'
+	genres = ['blues'] # , 'classical', 'country' , 'disco' , 'hiphop' , 'jazz' , 'metal' , 'pop' , 'reggae' , 'rock']
+	#main_path = '/home/nick/Desktop/Dissertation/Audio_Classification/GTZAN_Classificatin/Genres'
+	main_path = 'C:/Users/nick/Desktop/Dissertation/Audio_Classification/GTZAN_Classificatin/Genres'
 	n_samples = 100
 
 	for x in range(0 , len(genres)): 
