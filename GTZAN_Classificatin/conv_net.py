@@ -2,24 +2,27 @@ import filters
 import tensorflow as tf
 import numpy as np
 
-global X
-global Y
 
-X , Y , test_X , test_Y , num_examples = filters.main()
-X = np.array(X).astype(np.float32)
+X , Y , test_X , test_Y , num_examples = filters.main()   
+print(len(Y[1]))
+X , Y = np.array(X).astype(np.float32) , np.array(Y).astype(np.float32)
 
-n_classes = 10
+
+n_classes = 1
 
 keep_rate = 0.8
 keep_prob = tf.placeholder(tf.float32)
 
-y = tf.placeholder('float' , [None , 10])
 x = tf.placeholder('float' , [None , 13440])
+y = tf.placeholder('float')
 
-batch_size = 64
+
+batch_size = 20
 
 def get_next_batch(i , batch_size): 
-  return X[int(i*batch_size) , int((i+1)*batch_size)] , Y[int(i*batch_size) , int((i+1)*batch_size)] 
+  x_test = np.array(X[int(i*batch_size) : int((i+1)*batch_size)]).astype(np.float32)
+  y_test = np.array(Y[int(i*batch_size) : int((i+1)*batch_size)]).astype(np.float32)
+  return x_test , y_test
 
 
 def conv2d(x , W): 
@@ -29,7 +32,6 @@ def maxpool2d(x):
   return tf.nn.max_pool(x , ksize = [1 , 2 , 2 , 1] , strides = [1 , 2 , 2 , 1] , padding = 'SAME')
 
 def neural_network_model(x): 
-  print(x.shape)
   weights = {'W_Conv1' : tf.Variable(tf.random_normal([5,5,1,534])),
               'W_Conv2' : tf.Variable(tf.random_normal([5,5,534,1068])),
               'W_FC' : tf.Variable(tf.random_normal([120*7*1068, 1024])),
@@ -55,14 +57,14 @@ def neural_network_model(x):
   print(conv2.shape)
 
   fc = tf.reshape(conv2,[-1, 120*7*1068])
-  fc = tf.nn.relu(tf.matmul(fc, weights['W_FC'])+biases['B_FC'])
+  fc = tf.nn.relu(tf.matmul(fc, weights['W_FC']) + biases['B_FC'])
   fc = tf.nn.dropout(fc, keep_rate)
 
-  output = tf.matmul(fc, weights['Out'])+biases['Out']
+  output = tf.matmul(fc, weights['Out']) + biases['Out']
 
   return output
 
-def train_network(x , test_x , test_y , num_examples , batch_size): 
+def train_network(x): 
   prediction = neural_network_model(x)
   cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = prediction , labels = y))
   optimizer = tf.train.AdamOptimizer().minimize(cost)
@@ -75,17 +77,18 @@ def train_network(x , test_x , test_y , num_examples , batch_size):
     for epoch in range(0 , hm_epochs): 
       epoch_loss = 0 
       received = 0
-      for _ in range(num_examples/batch_size): 
+      for _ in range(0 , int(num_examples/batch_size)): 
+        print('Batch read')
         epoch_x , epoch_y = get_next_batch(received , batch_size)
         _ , c = sess.run([optimizer , cost] , feed_dict = {x : epoch_x , y : epoch_y})
         epoch_loss += c
         received += 1 
 
-      print('Epoch', epoch, 'completed out of',hm_epochs,'loss:',epoch_loss)
+      print('Epoch' , epoch, 'completed out of' , hm_epochs , 'loss:' , epoch_loss)
 
   correct = tf.equal(tf.argmax(prediction , 1) , tf.argmax(y , 1))
   accuracy = tf.reduce_mean(tf.cast(correct , 'float'))
   print('Accuracy:',accuracy.eval({x:test_x, y:test_y}))
 
 
-train_network(X , test_X , test_Y , num_examples , batch_size)
+train_network(X)
